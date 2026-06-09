@@ -182,15 +182,48 @@ client.on('messageCreate', async (message: Message) => {
   const content = message.content.trim();
 
   // 1- آلية تعيين وإدارة روم الذكاء الاصطناعي المباشر
-  const configTriggers = [
-    "هذا الروم للذكاء الاصطناعي",
-    "!تعيين روم الذكاء",
-    "!روم الذكاء",
-    "!set-ai-channel",
-    "تفعيل الذكاء الاصطناعي بروم منفصل"
-  ];
+  const isAiChannelConfigTrigger = (text: string): boolean => {
+    const norm = text.trim().toLowerCase().replace(/\s+/g, " ");
+    
+    // الاختصارات والأوامر المباشرة
+    const exactShortcuts = [
+      "!set-ai-channel",
+      "!روم-الذكاء",
+      "!تعيين-روم-الذكاء",
+      "!روم الذكاء",
+      "!روم للذكاء"
+    ];
+    if (exactShortcuts.some(s => norm.includes(s) || norm === s)) return true;
 
-  if (configTriggers.includes(content)) {
+    // التحقق من تراكيب الجمل الشائعة باللغة العربية
+    const hasRoom = norm.includes("روم") || norm.includes("قناة") || norm.includes("الغرفة") || norm.includes("القناة");
+    const hasAi = norm.includes("ذكاء") || norm.includes("الاصطناعي") || norm.includes("ai") || norm.includes("جيميني") || norm.includes("gemini");
+    const hasSettingWord = norm.includes("هذا") || norm.includes("هاذا") || norm.includes("تعيين") || norm.includes("تفعيل") || norm.includes("تخصيص") || norm.includes("هادي") || norm.includes("هذه");
+
+    // الكلمات الدلالية المدمجة
+    if (hasRoom && hasAi && (hasSettingWord || norm.includes("للذكاء"))) {
+      return true;
+    }
+
+    // مطابقة التعبيرات القصيرة الشائعة جداً
+    const commonPhrases = [
+      "روم الذكاء",
+      "روم للذكاء",
+      "قناة الذكاء",
+      "هاذا الروم للذكاء",
+      "هذا الروم للذكاء",
+      "روم الذكاء الاصطناعي",
+      "هاذا الروم للذكاء الاصطناعي",
+      "هذا الروم للذكاء الاصطناعي",
+      "روم الai",
+      "روم ال ai"
+    ];
+    if (commonPhrases.some(p => norm.includes(p) || norm === p)) return true;
+
+    return false;
+  };
+
+  if (isAiChannelConfigTrigger(content)) {
     // التحقق من صلاحيات العضو المرسِل (مدير أو لديه إدارة الخادم)
     if (!message.member?.permissions.has(PermissionsBitField.Flags.Administrator) && 
         !message.member?.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
