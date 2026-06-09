@@ -1,0 +1,14 @@
+{
+  "name": "discord-ai-manager-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "npx tsx bot.ts"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "@google/genai": "^2.4.1",
+    "dotenv": "^17.2.3",
+    "tsx": "^4.21.0"
+  }
+}
